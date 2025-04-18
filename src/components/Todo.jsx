@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 const Todo = () => {
   const [taskInput, setTaskInput] = useState("");
   const [tasks, setTasks] = useState([]); //this will be the array of objects
+  const [filter, setFilter] = useState('all');
 
   const isMounted = useRef(false);
   // load tasks from localStorage
@@ -12,7 +13,6 @@ const Todo = () => {
       console.log("Fetched from localStorage: ", savedTasks);
       if (savedTasks) {
         const parsed = JSON.parse(savedTasks);
-        console.log("Loaded from localStorage: ", parsed);
         setTasks(parsed);
       }
     } catch (error) {
@@ -57,6 +57,13 @@ const Todo = () => {
     );
   };
 
+  // filtered tasks based on current filter
+  const filteredTasks = tasks.filter((task) => {
+    if(filter === 'active') return !task.complete;
+    if(filter === 'completed') return task.complete;
+    return true; // for all
+  })
+
   return (
     <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
       <div className="bg-white p-6 rounded-xl shadow-md w-full max-w-md">
@@ -79,8 +86,30 @@ const Todo = () => {
           </button>
         </div>
 
+        <div className="flex justify-center gap-4 mb-4">
+          {/* Filter Buttons  */}
+          <button
+            onClick={() => setFilter('all')}
+            className={`px-3 py-1 rounded-lg ${filter === 'all' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter('active')}
+            className={`px-3 py-1 rounded-lg ${filter === 'active' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          >
+            Active
+          </button>
+          <button
+            onClick={() => setFilter('completed')}
+            className={`px-3 py-1 rounded-lg ${filter === 'completed' ? 'bg-blue-600 text-white' : 'bg-gray-200'}`}
+          >
+            Completed
+          </button>
+        </div>
+
         <ul className="space-y-3">
-          {tasks.map((task) => (
+          {filteredTasks.map((task) => (
             <li className="flex justify-between items-center" key={task.id}>
               <span
                 className={
